@@ -1,0 +1,132 @@
+data_table:
+  - grid_name: ATM
+    fieldname_in_model: p_surf
+    override_file:
+      - file_name: ./INPUT/ERA5_mean_sea_level_pressure.nc
+        fieldname_in_file: msl
+        interp_method: bilinear
+    factor: 1.0
+
+  - grid_name: ATM
+    fieldname_in_model: p_bot
+    override_file:
+      - file_name: ./INPUT/ERA5_mean_sea_level_pressure.nc
+        fieldname_in_file: msl
+        interp_method: bilinear
+    factor: 1.0
+
+  - grid_name: ATM
+    fieldname_in_model: t_bot
+    override_file:
+      - file_name: ./INPUT/ERA5_2m_temperature.nc
+        fieldname_in_file: t2m
+        interp_method: bilinear
+    factor: 1.0
+
+  - grid_name: ATM
+    fieldname_in_model: sphum_bot
+    override_file:
+      - file_name: ./INPUT/ERA5_2m_specific_humidity.nc
+        fieldname_in_file: q2m
+        interp_method: bilinear
+    factor: 1.0
+
+  - grid_name: ATM
+    fieldname_in_model: u_bot
+    override_file:
+      - file_name: ./INPUT/ERA5_10m_u_component_of_wind.nc
+        fieldname_in_file: u10
+        interp_method: bicubic
+    factor: 1.0
+
+  - grid_name: ATM
+    fieldname_in_model: v_bot
+    override_file:
+      - file_name: ./INPUT/ERA5_10m_v_component_of_wind.nc
+        fieldname_in_file: v10
+        interp_method: bicubic
+    factor: 1.0
+
+  - grid_name: ATM
+    fieldname_in_model: z_bot
+    factor: 10.0
+
+  - grid_name: ATM
+    fieldname_in_model: gust
+    factor: 1.0e-4
+
+  - grid_name: ICE
+    fieldname_in_model: lw_flux_dn
+    override_file:
+      - file_name: ./INPUT/ERA5_surface_thermal_radiation_downwards.nc
+        fieldname_in_file: strd
+        interp_method: bilinear
+    factor: 1.0
+
+  - grid_name: ICE
+    fieldname_in_model: sw_flux_vis_dir_dn
+    override_file:
+      - file_name: ./INPUT/ERA5_surface_solar_radiation_downwards.nc
+        fieldname_in_file: ssrd
+        interp_method: bilinear
+    factor: 0.285
+
+  - grid_name: ICE
+    fieldname_in_model: sw_flux_vis_dif_dn
+    override_file:
+      - file_name: ./INPUT/ERA5_surface_solar_radiation_downwards.nc
+        fieldname_in_file: ssrd
+        interp_method: bilinear
+    factor: 0.285
+
+  - grid_name: ICE
+    fieldname_in_model: sw_flux_nir_dir_dn
+    override_file:
+      - file_name: ./INPUT/ERA5_surface_solar_radiation_downwards.nc
+        fieldname_in_file: ssrd
+        interp_method: bilinear
+    factor: 0.215
+
+  - grid_name: ICE
+    fieldname_in_model: sw_flux_nir_dif_dn
+    override_file:
+      - file_name: ./INPUT/ERA5_surface_solar_radiation_downwards.nc
+        fieldname_in_file: ssrd
+        interp_method: bilinear
+    factor: 0.215
+
+  - grid_name: ICE
+    fieldname_in_model: lprec
+    override_file:
+      - file_name: ./INPUT/ERA5_total_rainfall_rate.nc
+        fieldname_in_file: rain
+        interp_method: bilinear
+    factor: 1.0
+
+  - grid_name: ICE
+    fieldname_in_model: fprec
+    override_file:
+      - file_name: ./INPUT/ERA5_total_snowfall_rate.nc
+        fieldname_in_file: snow
+        interp_method: bilinear
+    factor: 1.0
+
+  - grid_name: ICE
+    fieldname_in_model: dhdt
+    factor: 80.0
+
+  - grid_name: ICE
+    fieldname_in_model: dedt
+    factor: 2.0e-6
+
+  - grid_name: ICE
+    fieldname_in_model: drdt
+    factor: 10.0
+
+  - grid_name: OCN
+    fieldname_in_model: runoff
+    override_file:
+      - file_name: ./INPUT/runoff.daitren.clim.0.08deg.nc
+        fieldname_in_file: runoff
+        interp_method: none
+    factor: 1.0

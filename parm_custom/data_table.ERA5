@@ -1,0 +1,19 @@
+"ATM", "p_surf",             "msl",     "./INPUT/ERA5_mean_sea_level_pressure.nc",             "bilinear",   1.0
+"ATM", "p_bot",              "msl",     "./INPUT/ERA5_mean_sea_level_pressure.nc",             "bilinear",   1.0
+"ATM", "t_bot",              "t2m",     "./INPUT/ERA5_2m_temperature.nc",                      "bilinear",   1.0
+"ATM", "sphum_bot",          "q2m",     "./INPUT/ERA5_2m_specific_humidity.nc",                "bilinear",   1.0
+"ATM", "u_bot",              "u10",     "./INPUT/ERA5_10m_u_component_of_wind.nc",             "bicubic",    1.0
+"ATM", "v_bot",              "v10",     "./INPUT/ERA5_10m_v_component_of_wind.nc",             "bicubic",    1.0
+"ATM", "z_bot",              "",        "",                                                    "bilinear",  10.0
+"ATM", "gust",               "",        "",                                                    "bilinear",   1.0e-4
+"ICE", "lw_flux_dn",         "strd",    "./INPUT/ERA5_surface_thermal_radiation_downwards.nc", "bilinear",   1.0
+"ICE", "sw_flux_vis_dir_dn", "ssrd",    "./INPUT/ERA5_surface_solar_radiation_downwards.nc",   "bilinear",   0.285
+"ICE", "sw_flux_vis_dif_dn", "ssrd",    "./INPUT/ERA5_surface_solar_radiation_downwards.nc",   "bilinear",   0.285
+"ICE", "sw_flux_nir_dir_dn", "ssrd",    "./INPUT/ERA5_surface_solar_radiation_downwards.nc",   "bilinear",   0.215
+"ICE", "sw_flux_nir_dif_dn", "ssrd",    "./INPUT/ERA5_surface_solar_radiation_downwards.nc",   "bilinear",   0.215
+"ICE", "lprec",              "rain",    "./INPUT/ERA5_total_rainfall_rate.nc",                 "bilinear",   1.0
+"ICE", "fprec",              "snow",    "./INPUT/ERA5_total_snowfall_rate.nc",                 "bilinear",   1.0
+"ICE", "dhdt",               "",        "",                                                    "none",      80.0
+"ICE", "dedt",               "",        "",                                                    "none",       2.0e-6
+"ICE", "drdt",               "",        "",                                                    "none",      10.0
+"OCN", "runoff", "runoff", "./INPUT/runoff.daitren.clim.0.08deg.nc",                           "none" ,      1.0
