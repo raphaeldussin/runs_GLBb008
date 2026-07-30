@@ -4,6 +4,7 @@
 #SBATCH --mail-type=END,FAIL
 # -- Request that this job run on orion
 #SBATCH --partition=orion
+#SBATCH --qos=urgent
 #
 # -- Request 2119 cores
 #SBATCH --ntasks=2119
@@ -21,7 +22,7 @@
 #SBATCH --chdir=.
 
 # number of jobs to run:
-njobs=60
+njobs=72
 # state of the run (i.e. date)
 STATE_FILE="state.txt"
 # forcing variables to subset
@@ -117,7 +118,7 @@ if [[ $thisjob == 1 ]] ; then
    yearbeg=$( grep "current_date" input.nml | sed -e "s/,/ /g" | awk '{print $3}' )
    echo "$yearbeg 01" | cat > $STATE_FILE
 # at second job, replace init by restart
-elif [[ $thisjob == 2 ]] ; then
+elif [[ $thisjob != 1 ]] ; then
    sed -i -e "s/input_filename = 'n'/input_filename = 'r'/g" input.nml
 fi
 
