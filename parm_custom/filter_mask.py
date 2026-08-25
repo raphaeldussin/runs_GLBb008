@@ -2,13 +2,14 @@ import numpy as np
 from glob import glob
 
 # machine dependent parameters
-ncores_per_node = 40
+ncores_per_node = 40 # orion
+ncores_per_node = 80 # hercules
 fill_all_nodes = False
-last_node_occupancy = 80 # in %
+last_node_occupancy = 40 # in %
 IOlayout_x = 4
 IOlayout_y = 4
 
-tables = glob("all_tables/mask_table.*")
+tables = glob("mask_tables/mask_table.*")
 
 squareish_tables = []
 for table in tables:
@@ -53,4 +54,7 @@ print(f" keeping {len(fullnode_tables)} out of {len(squareish_tables)} candidate
 
 print("you can now copy the following tables, by copy/pasting this:")
 for table in fullnode_tables:
-    print(f"cp {table} .")
+    #mask_table.1228.76x56
+    _, land, x, y = table.replace(".", " ").replace("x"," ").split()
+    tot_pes = int(x)*int(y)-int(land)
+    print(f"cp {table} . # {tot_pes} PEs")

@@ -1,3 +1,11 @@
 slurm*
 *.nc
 *.nc.????
+autorestart*
+MOM6
+INPUT
+outputs_raw
+restarts_raw
+logs
+jobscompleted
+state.txt

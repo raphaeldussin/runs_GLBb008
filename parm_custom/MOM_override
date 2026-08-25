@@ -23,3 +23,6 @@
 ! numerics
 #override MAXTRUNC = 0
 #override MIN_THICKNESS = 0.001
+#override DEBUG_TRUNCATIONS = True
+#override U_TRUNC_FILE = "truncations_u.txt"
+#override V_TRUNC_FILE = "truncations_v.txt"
