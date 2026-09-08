@@ -1,0 +1,288 @@
+#!/bin/bash -l
+#
+#SBATCH --mail-user=Raphael.Dussin@noaa.gov
+#SBATCH --mail-type=END,FAIL
+# -- Request that this job run on orion
+#SBATCH --partition=hercules
+#
+# -- Request 3955 cores
+#SBATCH --ntasks=3955
+#
+# -- Specify a maximum wallclock of 4 hours
+#SBATCH --time=8:00:00
+#
+# -- Specify under which account a job should run
+#SBATCH --account=marine-cpu
+#
+# -- Set the name of the job, or Slurm will default to the name of the script
+#SBATCH --job-name=GLBb008_ERA5_hycom1
+#
+# -- Tell the batch system to set the working directory to the current working directory
+#SBATCH --chdir=.
+
+# number of jobs to run:
+njobs=72
+# state of the run (i.e. date)
+STATE_FILE="state.txt"
+# forcing variables to subset
+forcing_dir="/work/noaa/marine/rdussin/datasets/ERA5/forcing_MOM6"
+FILE_PREFIXES=("ERA5_10m_u_component_of_wind" "ERA5_10m_v_component_of_wind" "ERA5_2m_specific_humidity" "ERA5_2m_temperature" "ERA5_mean_sea_level_pressure" "ERA5_surface_solar_radiation_downwards" "ERA5_surface_thermal_radiation_downwards" "ERA5_total_rainfall_rate" "ERA5_total_snowfall_rate")
+
+# --------------------------------------------------------------------------------
+# setup the run directory
+# --------------------------------------------------------------------------------
+
+if [ ! -d INPUT ] ; then mkdir INPUT ; fi
+if [ ! -d RESTART ] ; then mkdir RESTART ; fi
+if [ ! -d outputs_raw ] ; then mkdir outputs_raw ; fi
+if [ ! -d restarts_raw ] ; then mkdir restarts_raw ; fi
+if [ ! -d logs ] ; then mkdir logs ; fi
+
+# copy executable and input files
+cp /work/noaa/marine/rdussin/MOM6-examples/build/intel/ice_ocean_SIS2/repro/MOM6 .
+cp /work/noaa/marine/rdussin/MOM6-examples/env.sh .
+
+# copy namelists
+cp /work/noaa/marine/rdussin/RTOFS_GLO/parm/diag_table .
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/data_table.ERA5 ./data_table
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/field_table .
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/diag_table .
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/MOM_{input,override} ./INPUT/.
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/input.nml.era5 ./input.nml
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/SIS_{input,override} ./INPUT/.
+
+# layout and mask_table
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/mask_table.1677.88x64 ./INPUT/.
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/MOM_layout.1677.88x64 ./INPUT/MOM_layout
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/SIS_layout.1677.88x64 ./INPUT/SIS_layout
+
+# grid, topo and other fixed files
+ln -sf /work/noaa/marine/rdussin/datasets/RTOFS3/fix/mom6/20250128/008/*.nc INPUT/.
+ln -sf /work/noaa/marine/rdussin/datasets/RTOFS3/fix/mom6/vgrid/hycom1_75_800m.nc INPUT/.
+ln -sf /work/noaa/marine/rdussin/datasets/RTOFS3/fix/mom6/vgrid/layer_coord.nc INPUT/.
+cp INPUT/ocean_topog.nc INPUT/topog.nc
+
+
+# setup environment/system
+source env.sh
+module load nco
+ulimit -s unlimited
+export NC_BLKSZ=1M
+
+# --------------------------------------------------------------------------------
+# functions for interannual forcing
+# --------------------------------------------------------------------------------
+
+is_leap_year() {
+    local y=$1
+    if (( (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0) )); then
+        echo 1
+    else
+        echo 0
+    fi
+}
+
+get_days_in_month() {
+    local y=$1
+    local m=$2
+    local days=(0 31 28 31 30 31 30 31 31 30 31 30 31)
+
+    if [[ $m -eq 2 ]]; then
+        local leap=$(is_leap_year "$y")
+        if [[ $leap -eq 1 ]]; then
+            echo 29
+        else
+            echo 28
+        fi
+    else
+        echo "${days[$m]}"
+    fi
+}
+
+
+ctrldir=$( pwd )
+subscript=mom.sub
+
+# --------------------------------------------------------------------------------
+# Control the looping for jobs
+
+if [ ! -f jobscompleted ] ; then touch jobscompleted ; fi
+
+lastjob=$( tail -1 jobscompleted )
+thisjob=$(( $lastjob + 1 )) # if file empty, takes job number one
+
+echo 'starting job #' $thisjob
+
+# at first job, replace restart by cold start and set up state file
+if [[ $thisjob == 1 ]] ; then
+   sed -i -e "s/input_filename = 'r'/input_filename = 'n'/g" input.nml
+   yearbeg=$( grep "current_date" input.nml | sed -e "s/,/ /g" | awk '{print $3}' )
+   echo "$yearbeg 01" | cat > $STATE_FILE
+# at second job, replace init by restart
+elif [[ $thisjob != 1 ]] ; then
+   sed -i -e "s/input_filename = 'n'/input_filename = 'r'/g" input.nml
+fi
+
+# --------------------------------------------------------------------------------
+# Setup initial conditions
+# IC from Matt's JRA run
+if [[ $thisjob == 1 ]] ; then
+  ln -sf /work/noaa/marine/rdussin/datasets/ICs/ocean_MOM6_GLBc008_Matt_Jan2020/remap_RTOFS3/ocean_init_202001_MOM6_1x1deg.nc ./INPUT/.
+  ln -sf /work/noaa/marine/rdussin/datasets/ICs/seaice_SIS2_Matt_Jan2020_restart/*.nc ./INPUT/.
+  #else
+  #lastjob=$(( $thisjob - 1 ))
+  #ln -sf ${ctrldir}/restarts_raw/restarts.$lastjob/* ./INPUT/.
+fi
+
+# --------------------------------------------------------------------------------
+# Read current year and month for forcing files
+
+if [[ ! -f "$STATE_FILE" ]]; then
+    echo "Error: $STATE_FILE not found. Create it with 'YYYY MM' (e.g., '2023 01')."
+    exit 1
+fi
+
+read -r YYYY MM < "$STATE_FILE"
+
+YEAR=$((10#$YYYY))
+MONTH=$((10#$MM))
+MM_STR=$(printf "%02d" "$MONTH")
+
+CUMULATIVE_DAYS=0
+for (( m=1; m<MONTH; m++ )); do
+    DAYS_IN_PREV=$(get_days_in_month "$YEAR" "$m")
+    CUMULATIVE_DAYS=$(( CUMULATIVE_DAYS + DAYS_IN_PREV ))
+done
+
+START_INDEX=$(( CUMULATIVE_DAYS * 24 + 1 )) # hardcoded hourly
+DAYS_IN_CURRENT=$(get_days_in_month "$YEAR" "$MONTH")
+HOURS_IN_CURRENT=$(( DAYS_IN_CURRENT * 24 ))
+
+echo "========================================"
+echo "Batch Processing Date : $YEAR-$MM_STR"
+echo "Days in Month         : $DAYS_IN_CURRENT"
+echo "Starting Index        : $START_INDEX"
+echo "========================================"
+
+subset_nc() {
+    local prefix=$1
+    local input_file="${forcing_dir}/${prefix}_${YEAR}.nc"
+    local output_file="INPUT/${prefix}.nc"
+    
+    echo "--> Processing: $input_file"
+
+    if [[ ! -f "$input_file" ]]; then
+        echo "    Error: $input_file does not exist. Aborting."
+        return 1
+    fi
+
+    if [[ $MONTH -eq 12 ]]; then
+        # December Logic
+        local end_index=$(( START_INDEX + HOURS_IN_CURRENT - 1 ))
+        local next_year=$(( YEAR + 1 ))
+        local next_input="${forcing_dir}/${prefix}_${next_year}.nc"
+        
+        local temp_dec="temp_dec_${prefix}_${YEAR}.nc"
+        local temp_jan="temp_jan_${prefix}_${next_year}.nc"
+
+        if [[ ! -f "$next_input" ]]; then
+            echo "    Error: Next year's input file ($next_input) missing."
+            return 1
+        fi
+
+        # Subset December
+        ncks -O -F -d time,"$START_INDEX","$end_index" "$input_file" "$temp_dec"
+        local status_dec=$?
+
+        # Subset January 1st hour
+        ncks -O -F -d time,1,1 "$next_input" "$temp_jan"
+        local status_jan=$?
+
+        if [[ $status_dec -eq 0 && $status_jan -eq 0 ]]; then
+            ncrcat -O "$temp_dec" "$temp_jan" "$output_file"
+            local cat_status=$?
+            rm -f "$temp_dec" "$temp_jan"
+            return $cat_status
+        else
+            echo "    Error: ncks failed during December splitting for $prefix."
+            rm -f "$temp_dec" "$temp_jan"
+            return 1
+        fi
+    else
+        # Standard Logic (Jan-Nov)
+        local end_index=$(( START_INDEX + HOURS_IN_CURRENT ))
+        ncks -O -F -d time,"$START_INDEX","$end_index" "$input_file" "$output_file"
+        return $?
+    fi
+}
+
+# subset all forcing files
+OVERALL_SUCCESS=0
+
+for PREFIX in "${FILE_PREFIXES[@]}"; do
+    subset_nc "$PREFIX"
+    if [[ $? -ne 0 ]]; then
+        echo "FAILED on $PREFIX. Halting batch process."
+        OVERALL_SUCCESS=1
+        break # Exit the loop immediately if any file fails
+    fi
+done
+
+# Fail job if all files not created
+if [[ $OVERALL_SUCCESS -eq 0 ]]; then
+    echo "========================================"
+    echo "All files processed successfully."
+else
+    echo "========================================"
+    echo "Error encountered. The state file was NOT updated."
+    exit 1
+fi
+
+
+# Run the model
+
+srun -n $SLURM_NTASKS ./MOM6 > fms.out 2>&1
+
+runok=$( tail -200 fms.out | grep -i "Total runtime" )
+if [[ $runok != '' ]] ; then
+   # move outputs
+   mv *.nc ./outputs_raw/.
+   mv *.nc.???? ./outputs_raw/.
+   # initiate transfer
+   #sbatch transfer.sub $thisyear
+   # save restarts and update links in INPUT
+   mkdir -p ./restarts_raw/restarts.$thisjob
+   mv RESTART/* ./restarts_raw/restarts.$thisjob/.
+   ln -sf ${ctrldir}/restarts_raw/restarts.$thisjob/* ./INPUT/.
+   # move logs
+   tar -cvf logs.tar.$thisjob *_parameter_doc.* fms.out *.stats logfile.* available_diags.000000 SIS.available_diags SIS_fast.available_diags diag_table data_table* field_table time_stamp.out warnfile.000000.out
+   mv logs.tar.$thisjob ./logs/.
+   rm *_parameter_doc.* fms.out *.stats logfile.* available_diags.000000 SIS.available_diags SIS_fast.available_diags diag_table data_table* field_table time_stamp.out warnfile.000000.out
+
+   # notify completion
+   echo $thisjob >> $ctrldir/jobscompleted
+   # test for resubmission
+   if (( $thisjob < $njobs )) ; then
+      cd $ctrldir ; sbatch ./$subscript
+   else
+      # final job
+      echo this is the last job
+   fi
+   # update state file
+   NEXT_MONTH=$(( MONTH + 1 ))
+   NEXT_YEAR=$YEAR
+    
+   if [[ $NEXT_MONTH -gt 12 ]]; then
+       NEXT_MONTH=1
+       NEXT_YEAR=$(( YEAR + 1 ))
+   fi
+    
+   NEXT_MM_STR=$(printf "%02d" "$NEXT_MONTH")
+    
+   echo "$NEXT_YEAR $NEXT_MM_STR" > "$STATE_FILE"
+   echo "Updated $STATE_FILE to the next run: $NEXT_YEAR $NEXT_MM_STR"
+else
+   # run blew up
+   echo "run blew up"
+   exit 1
+fi

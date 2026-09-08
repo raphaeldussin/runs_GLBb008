@@ -1,0 +1,38 @@
+! init
+#override INIT_LAYERS_FROM_Z_FILE = True
+#override TEMP_SALT_Z_INIT_FILE = ""
+#override TEMP_Z_INIT_FILE = "ocean_init_202001_MOM6_1x1deg.nc"
+#override SALT_Z_INIT_FILE = "ocean_init_202001_MOM6_1x1deg.nc"
+#override Z_INIT_FILE_PTEMP_VAR = "thetao"
+#override Z_INIT_FILE_SALT_VAR = "so"
+#override Z_INIT_ALE_REMAPPING = True
+#override Z_INIT_REMAP_GENERAL = True
+! time stepping
+#override DT = 300
+#override DT_THERM = 1200
+#override DT_TRACER_ADVECT = 1200
+#override DTBT_RESET_PERIOD = 1200
+! output
+#override ENERGYSAVEDAYS = 0.25
+#override SAVE_INITIAL_CONDS = False
+#override WRITE_GEOM = 0
+! bug fixes
+#override USTAR_GUSTLESS_BUG = False
+! numerics
+#override MAXTRUNC = 5000
+#override MIN_THICKNESS = 0.001
+#override DEBUG_TRUNCATIONS = True
+#override U_TRUNC_FILE = "truncations_u.txt"
+#override V_TRUNC_FILE = "truncations_v.txt"
+! vertical
+!#override MAXIMUM_DEPTH = 6000
+!#override FATAL_CHECK_RECONSTRUCTIONS = True
+!#override FATAL_CHECK_REMAPPING = True
+#override BOUND_BT_CORRECTION = False
+#override BT_PROJECT_VELOCITY = False
+#override DYNAMIC_SURFACE_PRESSURE = False
+#override BEBT = 0.1
+#override DTBT = -0.98
+#override REMAPPING_USE_OM4_SUBCELLS = False
+#override REMAPPING_SCHEME = "PLM"
+#override VELOCITY_REMAPPING_SCHEME = "PLM"
