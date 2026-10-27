@@ -3,10 +3,11 @@
 #SBATCH --mail-user=Raphael.Dussin@noaa.gov
 #SBATCH --mail-type=END,FAIL
 # -- Request that this job run on orion
-#SBATCH --partition=hercules
+#SBATCH --partition=orion
+#SBATCH --qos=batch
 #
-# -- Request 3955 cores
-#SBATCH --ntasks=3955
+# -- Request 2119 cores
+#SBATCH --ntasks=2119
 #
 # -- Specify a maximum wallclock of 4 hours
 #SBATCH --time=8:00:00
@@ -52,9 +53,9 @@ cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/input.nml.era5 ./input
 cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/SIS_{input,override} ./INPUT/.
 
 # layout and mask_table
-cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/mask_table.1677.88x64 ./INPUT/.
-cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/MOM_layout.1677.88x64 ./INPUT/MOM_layout
-cp /work/noaa/marine/rdussin/runs_mom6/parm_custom_hycom1/SIS_layout.1677.88x64 ./INPUT/SIS_layout
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom/mask_table.793.56x52 ./INPUT/.
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom/MOM_layout.793.56x52 ./INPUT/MOM_layout
+cp /work/noaa/marine/rdussin/runs_mom6/parm_custom/SIS_layout.793.56x52 ./INPUT/SIS_layout
 
 # grid, topo and other fixed files
 ln -sf /work/noaa/marine/rdussin/datasets/RTOFS3/fix/mom6/20250128/008/*.nc INPUT/.
@@ -68,6 +69,9 @@ source env.sh
 module load nco
 ulimit -s unlimited
 export NC_BLKSZ=1M
+#export UCX_MEM_CACHE=n
+#export UCX_MEM_MALLOC_HOOKS=no
+#export MPICH_MPIIO_HINTS="*:romio_cb_write=enable:romio_cb_read=enable"
 
 # --------------------------------------------------------------------------------
 # functions for interannual forcing
