@@ -1,1 +1,2 @@
 #override RESTART_CHECKSUMS_REQUIRED = False
+#override DT_ICE_DYNAMICS = 300.0

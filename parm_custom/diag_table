@@ -5,8 +5,9 @@
 
 # MOM6 ocean diagnostics files
 
-"ocean_daily",            1, "days",   1, "days", "time"
-"ocean_daily_snap",       1, "days",   1, "days", "time"
+#"ocean_daily",            1, "days",   1, "days", "time"
+#"ocean_daily_debug%4yr_%2mo_%2dy", 1, "days", 1, "days", "time", 1, "days", "2021 1 1 0 0 0"
+#"ocean_daily_snap",       1, "days",   1, "days", "time"
 "ocean_month",            1, "months", 1, "days", "time"
 "ocean_month_z",          1, "months", 1, "days", "time"
 "ocean_scalar_month",     1, "months", 1, "days", "time"
@@ -44,6 +45,17 @@
  "ocean_model", "areacello_cv","areacello_cv","ocean_static", "all", "none", "none", 2
  "ocean_model", "areacello_bu","areacello_bu","ocean_static", "all", "none", "none", 2
 
+# debuggin output
+# "ocean_model", "h",        "h",        "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "e",        "e",        "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "thetao",   "thetao",   "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "so",       "so",       "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "uo",       "uo",       "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "vo",       "vo",       "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "volcello", "volcello", "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "thkcello", "thkcello", "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+# "ocean_model", "rhopot0",  "rhopot0",  "ocean_daily_debug%4yr_%2mo_%2dy", "all", "none", "none", 2
+
 # -----------------------------------------------------------------------------------------
 # CMIP6/OMIP Table H1: scalar fields such as tracers, cell mass/volume, sea level, MLD
 # Generally save annuals, and sometimes monthly and daily.
@@ -53,29 +65,29 @@
  "ocean_model",   "masso",        "masso",            "ocean_scalar_month",  "all", "mean", "none",1  # global sum masscello
  "ocean_model",   "volo",         "volo",             "ocean_scalar_month",  "all", "mean", "none",1  # global sum thkcello
  "ocean_model",   "zos",          "zos",              "ocean_month",         "all", "mean", "none",2
- "ocean_model",   "zos",          "zos",              "ocean_daily",         "all", "mean", "none",2
- "ocean_model",   "zos",          "zosmin",           "ocean_daily",         "all", "min",  "none",2
- "ocean_model",   "zos",          "zosmax",           "ocean_daily",         "all", "max",  "none",2
+# "ocean_model",   "zos",          "zos",              "ocean_daily",         "all", "mean", "none",2
+# "ocean_model",   "zos",          "zosmin",           "ocean_daily",         "all", "min",  "none",2
+# "ocean_model",   "zos",          "zosmax",           "ocean_daily",         "all", "max",  "none",2
  "ocean_model",   "zossq",        "zossq",            "ocean_month",         "all", "mean", "none",2
  "ocean_model_z", "thetao",       "thetao",           "ocean_month_z",       "all", "mean", "none",2  # if use pre-TEOS10
  "ocean_model_z", "thetao_xyave", "thetao_xyave",     "ocean_month_z",      "all", "mean", "none",2  # if use pre-TEOS10
  "ocean_model",   "thetaoga",     "thetaoga",         "ocean_scalar_month",  "all", "mean", "none",1  # global mean theta
  "ocean_model",   "tos",          "tos",              "ocean_month",         "all", "mean", "none",2
- "ocean_model",   "tos",          "tos",              "ocean_daily",         "all", "mean", "none",2
- "ocean_model",   "tos",          "tosmin",           "ocean_daily",         "all", "min" , "none",2
- "ocean_model",   "tos",          "tosmax",           "ocean_daily",         "all", "max" , "none",2
+# "ocean_model",   "tos",          "tos",              "ocean_daily",         "all", "mean", "none",2
+# "ocean_model",   "tos",          "tosmin",           "ocean_daily",         "all", "min" , "none",2
+# "ocean_model",   "tos",          "tosmax",           "ocean_daily",         "all", "max" , "none",2
  "ocean_model",   "tosga",        "tosga",            "ocean_scalar_month",  "all", "mean", "none",1
  "ocean_model",   "tossq",        "tossq",            "ocean_month",         "all", "mean", "none",2
- "ocean_model",   "tossq",        "tossq",            "ocean_daily",         "all", "mean", "none",2
+# "ocean_model",   "tossq",        "tossq",            "ocean_daily",         "all", "mean", "none",2
  "ocean_model",   "tob",          "tob",              "ocean_month",         "all", "mean", "none",2
  "ocean_model_z", "so",           "so",               "ocean_month_z",       "all", "mean", "none",2
  "ocean_model_z", "so_xyave",     "so_xyave",         "ocean_month_z",      "all", "mean", "none",2
  "ocean_model",   "soga",         "soga",             "ocean_scalar_month",  "all", "mean", "none",1
  "ocean_model",   "sos",          "sos",              "ocean_month",         "all", "mean", "none",2
- "ocean_model",   "sos",          "sos",              "ocean_daily",         "all", "mean", "none",2
+# "ocean_model",   "sos",          "sos",              "ocean_daily",         "all", "mean", "none",2
  "ocean_model",   "sosga",        "sosga",            "ocean_scalar_month",  "all", "mean", "none",1
  "ocean_model",   "sossq",        "sossq",            "ocean_month",         "all", "mean", "none",2
- "ocean_model",   "sossq",        "sossq",            "ocean_daily",         "all", "mean", "none",2
+# "ocean_model",   "sossq",        "sossq",            "ocean_daily",         "all", "mean", "none",2
  "ocean_model",   "sob",          "sob",              "ocean_month",         "all", "mean", "none",2
  "ocean_model_z", "obvfsq",       "obvfsq",           "ocean_month_z",       "all", "mean", "none",2
  "ocean_model",   "mlotst",       "mlotst",           "ocean_month",         "all", "mean", "none",2
@@ -164,9 +176,9 @@
 
 # -----------------------------------------------------------------------------------------
 # High-frequency
- "ocean_model", "SSU",          "ssu",              "ocean_daily_snap", "all", "none", "none",2
- "ocean_model", "SSV",          "ssv",              "ocean_daily_snap", "all", "none", "none",2
- "ocean_model", "speed",        "speed",            "ocean_daily_snap", "all", "none", "none",2
+# "ocean_model", "SSU",          "ssu",              "ocean_daily_snap", "all", "none", "none",2
+# "ocean_model", "SSV",          "ssv",              "ocean_daily_snap", "all", "none", "none",2
+# "ocean_model", "speed",        "speed",            "ocean_daily_snap", "all", "none", "none",2
 #"ocean_model", "tos",          "tos_max",          "ocean_daily", "all", "max",  "none",2
 #"ocean_model", "tos",          "tos_min",          "ocean_daily", "all", "min",  "none",2
 #"ocean_model", "ePBL_h_ML",    "omldamax",         "ocean_daily", "all", "max",  "none",2

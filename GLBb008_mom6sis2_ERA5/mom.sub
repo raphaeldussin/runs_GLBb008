@@ -4,7 +4,7 @@
 #SBATCH --mail-type=END,FAIL
 # -- Request that this job run on orion
 #SBATCH --partition=orion
-#SBATCH --qos=urgent
+#SBATCH --qos=batch
 #
 # -- Request 2119 cores
 #SBATCH --ntasks=2119
@@ -60,7 +60,15 @@ cp /work/noaa/marine/rdussin/runs_mom6/parm_custom/SIS_layout.793.56x52 ./INPUT/
 # grid, topo and other fixed files
 ln -sf /work/noaa/marine/rdussin/datasets/RTOFS3/fix/mom6/20250128/008/*.nc INPUT/.
 cp INPUT/ocean_topog.nc INPUT/topog.nc
+# new hybrid coords
+ln -sf /work/noaa/marine/rdussin/datasets/RTOFS3/fix/mom6/20260827/008/*.nc ./INPUT/.
 
+# dirty overrides
+cat >> INPUT/MOM_override << EOF
+#override BAD_VAL_SSS_MAX = 80
+#override MAXIMUM_INT_DEPTH_CONFIG = "NONE"
+#override MAX_LAYER_THICKNESS_CONFIG = "NONE"
+EOF
 
 # setup environment/system
 source env.sh
@@ -126,8 +134,11 @@ fi
 # Setup initial conditions
 # IC from Matt's JRA run
 if [[ $thisjob == 1 ]] ; then
-  ln -sf /work/noaa/marine/rdussin/datasets/ICs/ocean_MOM6_GLBc008_Matt_Jan2020/remap_RTOFS3/ocean_init_202001_MOM6_1x1deg.nc ./INPUT/.
-  ln -sf /work/noaa/marine/rdussin/datasets/ICs/seaice_SIS2_Matt_Jan2020_restart/*.nc ./INPUT/.
+  ln -sf /work/noaa/marine/rdussin/datasets/ICs/glorys/IC_Glorys12v1_so_y2020m01d01.nc ./INPUT/.
+  ln -sf /work/noaa/marine/rdussin/datasets/ICs/glorys/IC_Glorys12v1_thetao_y2020m01d01.nc ./INPUT/.
+  #ln -sf /work/noaa/marine/rdussin/datasets/ICs/ocean_MOM6_GLBc008_Matt_Jan2020/remap_RTOFS3/ocean_init_202001_MOM6_1x1deg.nc ./INPUT/.
+  ln -sf /work/noaa/marine/rdussin/datasets/ICs/seaice_restart_from_zstar_run/*.nc ./INPUT/.
+  #ln -sf /work/noaa/marine/rdussin/datasets/ICs/seaice_SIS2_Matt_Jan2020_restart/*.nc ./INPUT/.
   #else
   #lastjob=$(( $thisjob - 1 ))
   #ln -sf ${ctrldir}/restarts_raw/restarts.$lastjob/* ./INPUT/.

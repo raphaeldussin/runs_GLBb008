@@ -1,10 +1,10 @@
 ! init
 #override INIT_LAYERS_FROM_Z_FILE = True
 #override TEMP_SALT_Z_INIT_FILE = ""
-#override TEMP_Z_INIT_FILE = "ocean_init_202001_MOM6_1x1deg.nc"
-#override SALT_Z_INIT_FILE = "ocean_init_202001_MOM6_1x1deg.nc"
-!#override TEMP_Z_INIT_FILE = "IC_Glorys12v1_thetao_y2020m01d01.nc"
-!#override SALT_Z_INIT_FILE = "IC_Glorys12v1_so_y2020m01d01.nc"
+!#override TEMP_Z_INIT_FILE = "ocean_init_202001_MOM6_1x1deg.nc"
+!#override SALT_Z_INIT_FILE = "ocean_init_202001_MOM6_1x1deg.nc"
+#override TEMP_Z_INIT_FILE = "IC_Glorys12v1_thetao_y2020m01d01.nc"
+#override SALT_Z_INIT_FILE = "IC_Glorys12v1_so_y2020m01d01.nc"
 #override Z_INIT_FILE_PTEMP_VAR = "thetao"
 #override Z_INIT_FILE_SALT_VAR = "so"
 #override Z_INIT_ALE_REMAPPING = True
@@ -21,8 +21,8 @@
 ! bug fixes
 #override USTAR_GUSTLESS_BUG = False
 ! numerics
-#override MAXTRUNC = 0
-#override MIN_THICKNESS = 0.001
-#override DEBUG_TRUNCATIONS = True
+#override MAXTRUNC = 500
+!#override MIN_THICKNESS = 0.001
+#override DEBUG_TRUNCATIONS = False
 #override U_TRUNC_FILE = "truncations_u.txt"
 #override V_TRUNC_FILE = "truncations_v.txt"
